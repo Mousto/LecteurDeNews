@@ -12,8 +12,6 @@ public class TitreNewsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_recycler);
 
-        Toast.makeText(this,"Bonjour, bienvenu !", Toast.LENGTH_LONG).show();
-
         final RecyclerView rv = (RecyclerView)findViewById(R.id.list);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(new MonAdapter());
