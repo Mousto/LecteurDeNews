@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class WebViewActivity extends AppCompatActivity {
 
@@ -15,19 +17,21 @@ public class WebViewActivity extends AppCompatActivity {
 
         // On récupère l'intent qui a lancé cette activité
         Intent i = getIntent();
+
         // Puis on récupère le htmlContent donné dans l'autre classe.
-        String[] htmlContent = i.getStringArrayExtra(MonAdapter.strMonHtmlContent);
-        //Titre
-        ActionBar ab = getSupportActionBar();
-        ab.setTitle(htmlContent[0]);
+        String url = i.getStringExtra(MonAdapter.monUrl);
 
         //insertion de contenu dans la webview
         WebView wv = (WebView)findViewById(R.id.ma_webview);
-        String cont = "<html><body style=text-align:justify>";
-        cont += htmlContent[1];
-        cont += "</body></html>";
-        wv.loadData(cont, "text/html; charset=UTF-8", null);
-
-
+        //permettre à la page web charger de s'ouvrir au sein de la webview et non dans le navigateur du téléphone
+        wv.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                    view.loadUrl(request.toString());
+                    return false;
+                }
+            });
+            wv.loadUrl(url);
     }
+
 }

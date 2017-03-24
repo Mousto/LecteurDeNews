@@ -8,18 +8,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.oc.rss.fake.FakeNews;
-import com.oc.rss.fake.FakeNewsList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import java.util.List;
+public class MonAdapter extends RecyclerView.Adapter<MonAdapter.MonViewHolder> implements XMLAsyncTask.DocumentConsumer {
 
-public class MonAdapter extends RecyclerView.Adapter<MonAdapter.MonViewHolder> {
+    private Document _document = null;
+    public static String monUrl = "monHtmlContent";
 
-    List<FakeNews> list = FakeNewsList.all;
-    public static String strMonHtmlContent = "monHtmlContent";
     @Override
     public int getItemCount() {
-        return list.size();
+        if(_document != null){
+            return _document.getElementsByTagName("item").getLength();
+        }
+        else {
+            return 0;
+        }
     }
 
     @Override
@@ -31,41 +35,44 @@ public class MonAdapter extends RecyclerView.Adapter<MonAdapter.MonViewHolder> {
 
     @Override
     public void onBindViewHolder(MonViewHolder holder, int position) {
-        FakeNews fn = list.get(position);
-        holder.display(fn);
+        Element item = (Element) _document.getElementsByTagName("item").item(position);
+        holder.setElement(item);
+    }
+
+    @Override
+    public void setXMLDocument(Document document)
+    {
+        _document = document;
+        notifyDataSetChanged();
     }
 
     public class MonViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView titre;
-        private FakeNews currentFakeNews;
-        private Context context = null;
-
+        private final TextView _titre;
+        private Element _currentElement;
+        private String _link;
 
         public MonViewHolder(final View itemView) {
             super(itemView);
 
-            context = itemView.getContext();
-
-            titre = ((TextView) itemView.findViewById(R.id.titre));
+            _titre = ((TextView)itemView.findViewById(R.id.titre));
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
-                    Intent i = new Intent(context, WebViewActivity.class);
-                    String[] tab = new String[] {currentFakeNews.title, currentFakeNews.htmlContent};
-                    i.putExtra(strMonHtmlContent, tab);
-                    context.startActivity(i);
+                Context context = view.getContext();
+                Intent i = new Intent(view.getContext(), WebViewActivity.class);
+                _link = _currentElement.getElementsByTagName("link").item(0).getTextContent();
+                i.putExtra(monUrl, _link);
+                context.startActivity(i);
                 }
             });
-
-
         }
 
-        public void display(FakeNews fn) {
-            currentFakeNews = fn;
-            titre.setText(currentFakeNews.title);
+        public void setElement(Element element)
+        {
+            _currentElement = element;
+            _titre.setText(element.getElementsByTagName("title").item(0).getTextContent());
         }
     }
 

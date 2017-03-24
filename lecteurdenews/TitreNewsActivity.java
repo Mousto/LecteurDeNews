@@ -14,7 +14,11 @@ public class TitreNewsActivity extends AppCompatActivity {
 
         final RecyclerView rv = (RecyclerView)findViewById(R.id.list);
         rv.setLayoutManager(new LinearLayoutManager(this));
-        rv.setAdapter(new MonAdapter());
+        MonAdapter adapter = new MonAdapter();
+        rv.setAdapter(adapter);
+
+        XMLAsyncTask task = new XMLAsyncTask(adapter);
+        task.execute("http://www.lemonde.fr/rss/une.xml");
     }
 
 }
